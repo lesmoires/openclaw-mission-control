@@ -1,41 +1,46 @@
 {
-  "name": "OpenClaw Mission Control - Les Moires",
-  "description": "Centre de commande multi-agents pour OpenClaw avec orchestration visuelle",
-  "icon": "https://raw.githubusercontent.com/lesmoires/openclaw-mission-control/main/icon.png",
-  "heroImage": "https://raw.githubusercontent.com/lesmoires/openclaw-mission-control/main/screenshot.png",
-  "author": "Les Moires",
-  "categories": ["DevTools", "Productivity", "AI"],
+  "$schema": "https://railway.com/railway.schema.json",
+  "name": "OpenClaw Mission Control",
+  "description": "Centre de commande multi-agents pour orchestration OpenClaw avec Kanban boards, gestion d'agents, et contrôle d'approbation",
+  "category": "developer-tools",
+  "icon": "https://raw.githubusercontent.com/lesmoires/openclaw-mission-control/main/icon.svg",
+  "heroImage": "https://github.com/user-attachments/assets/49a3c823-6aaf-4c56-8328-fb1485ee940f",
   "readme": "https://github.com/lesmoires/openclaw-mission-control/blob/main/DEPLOY_RAILWAY.md",
-  "website": "https://lesmoires.com",
+  "author": "Les Moires",
+  "version": "2.0.0",
   "env": {
     "AUTH_MODE": {
-      "description": "Mode d'authentification (local ou clerk)",
+      "description": "Mode d'authentification (local recommandé pour self-hosted)",
       "default": "local",
       "required": true
     },
     "LOCAL_AUTH_TOKEN": {
-      "description": "Token d'authentification local (50+ caractères)",
-      "required": true,
-      "generator": "openssl rand -hex 32"
+      "description": "Token d'authentification (min 50 caractères). Générer avec: openssl rand -hex 32",
+      "required": true
     },
     "OPENCLAW_GATEWAY_URL": {
-      "description": "URL du Gateway OpenClaw",
-      "default": "ws://host.railway.internal:18789",
+      "description": "URL du Gateway OpenClaw (private networking)",
+      "default": "ws://gateway.railway.internal:18789",
       "required": true
     },
     "OPENCLAW_GATEWAY_TOKEN": {
-      "description": "Token du Gateway OpenClaw",
+      "description": "Token d'accès au Gateway OpenClaw",
+      "required": true
+    },
+    "DATABASE_URL": {
+      "description": "URL PostgreSQL (utilise Supabase existant ou Railway Postgres)",
       "required": true
     }
   },
   "services": {
-    "backend": {
-      "name": "Mission Control Backend",
+    "mission-control-backend": {
+      "name": "Backend API",
       "description": "API FastAPI pour Mission Control"
     },
-    "frontend": {
-      "name": "Mission Control Frontend", 
+    "mission-control-frontend": {
+      "name": "Frontend UI",
       "description": "Interface utilisateur Next.js"
     }
-  }
+  },
+  "tags": ["openclaw", "ai", "agents", "orchestration", "kanban", "dashboard"]
 }
