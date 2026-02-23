@@ -1,0 +1,41 @@
+{
+  "name": "OpenClaw Mission Control - Les Moires",
+  "description": "Centre de commande multi-agents pour OpenClaw avec orchestration visuelle",
+  "icon": "https://raw.githubusercontent.com/lesmoires/openclaw-mission-control/main/icon.png",
+  "heroImage": "https://raw.githubusercontent.com/lesmoires/openclaw-mission-control/main/screenshot.png",
+  "author": "Les Moires",
+  "categories": ["DevTools", "Productivity", "AI"],
+  "readme": "https://github.com/lesmoires/openclaw-mission-control/blob/main/DEPLOY_RAILWAY.md",
+  "website": "https://lesmoires.com",
+  "env": {
+    "AUTH_MODE": {
+      "description": "Mode d'authentification (local ou clerk)",
+      "default": "local",
+      "required": true
+    },
+    "LOCAL_AUTH_TOKEN": {
+      "description": "Token d'authentification local (50+ caractères)",
+      "required": true,
+      "generator": "openssl rand -hex 32"
+    },
+    "OPENCLAW_GATEWAY_URL": {
+      "description": "URL du Gateway OpenClaw",
+      "default": "ws://host.railway.internal:18789",
+      "required": true
+    },
+    "OPENCLAW_GATEWAY_TOKEN": {
+      "description": "Token du Gateway OpenClaw",
+      "required": true
+    }
+  },
+  "services": {
+    "backend": {
+      "name": "Mission Control Backend",
+      "description": "API FastAPI pour Mission Control"
+    },
+    "frontend": {
+      "name": "Mission Control Frontend", 
+      "description": "Interface utilisateur Next.js"
+    }
+  }
+}

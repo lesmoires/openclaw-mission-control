@@ -1,53 +1,95 @@
 # ============================================
-# RAILWAY CONFIG - Mission Control 
-# OPTION A: Réutiliser Supabase Moira Rose
+# RAILWAY CONFIG - Mission Control Les Moires
+# Version: 2.0 (Production-Ready)
 # ============================================
 
 [build]
 builder = "NIXPACKS"
 
 # ============================================
-# AVANTAGES Option A:
+# MÉTADONNÉES
 # ============================================
-# ✅ Une seule DB PostgreSQL à gérer (déjà backupée)
-# ✅ Moins cher (pas de nouvelle instance Railway)
-# ✅ Schéma isolé `mission_control` dans Supabase existant
-# ✅ Pas de nouvelles variables DB à configurer
-#
-# INCONVÉNIENTS:
-# ⚠️ Mêmes ressources CPU/RAM que PG on Rails
-# ⚠️ Si Supabase down, MC down aussi
-# ⚠️ Pas de scaling indépendant
-# ============================================
+[metadata]
+name = "OpenClaw Mission Control - Les Moires"
+description = "Centre de commande multi-agents pour orchestration OpenClaw"
+icon = "🏗️"
+version = "2.0.0"
 
-# Backend service
+# ============================================
+# SERVICE: BACKEND (FastAPI)
+# ============================================
 [[services]]
 name = "mission-control-backend"
 path = "backend"
+
+# Build
+builder = "DOCKERFILE"
+dockerfilePath = "backend/Dockerfile"
+
+# Runtime
 startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+
+# Health & Resilience
 healthcheckPath = "/health"
 healthcheckTimeout = 60
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
 
-# Variables spécifiques Option A:
-# DATABASE_URL = ws://postgres.railway.internal:5432/railway?schema=mission_control
-# Ou utiliser l'URL Supabase existante
+# Resources (ajustable selon besoin)
+[resources]
+cpu = "shared"
+memory = "512Mi"
+disk = "1Gi"
 
-# Frontend service  
+# ============================================
+# SERVICE: FRONTEND (Next.js)
+# ============================================
 [[services]]
 name = "mission-control-frontend"
 path = "frontend"
-startCommand = "npm start"
+
+# Build
+builder = "NIXPACKS"
 buildCommand = "npm run build"
+startCommand = "npm start"
+
+# Health
 healthcheckPath = "/"
 healthcheckTimeout = 30
 
-# Worker service (Optionnel - peut utiliser Redis Railway ou pas de queue)
-[[services]]
-name = "mission-control-worker"
-path = "backend"
-startCommand = "python -m app.worker"  # Ou sans Redis si simple
-restartPolicyType = "ON_FAILURE"
+# Resources
+[resources]
+cpu = "shared"
+memory = "256Mi"
 
-# PAS de [[databases]] ici - on réutilise Supabase existant!
+# ============================================
+# SERVICE: WORKER (RQ - Optionnel)
+# Désactivé par défaut car on utilise mode synchrone
+# avec Supabase existant. Décommenter si besoin async.
+# ============================================
+# [[services]]
+# name = "mission-control-worker"
+# path = "backend"
+# startCommand = "rq worker -u $REDIS_URL"
+# restartPolicyType = "ON_FAILURE"
+
+# ============================================
+# BASE DE DONNÉES
+# Option A: Réutilise Supabase existant (moira-rose)
+# Option B: Décommenter ci-dessous pour nouvelle DB Railway
+# ============================================
+
+# [[databases]]
+# name = "mission-control-db"
+# engine = "POSTGRES"
+
+# [[databases]]
+# name = "mission-control-redis"  
+# engine = "REDIS"
+
+# ============================================
+# HOOKS (Optionnel)
+# ============================================
+# [[hooks]]
+# name = "post-deploy"
+# command = "curl -f http://localhost:$PORT/health || exit 1"
