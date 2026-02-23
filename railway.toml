@@ -1,0 +1,53 @@
+# ============================================
+# RAILWAY CONFIG - Mission Control 
+# OPTION A: Réutiliser Supabase Moira Rose
+# ============================================
+
+[build]
+builder = "NIXPACKS"
+
+# ============================================
+# AVANTAGES Option A:
+# ============================================
+# ✅ Une seule DB PostgreSQL à gérer (déjà backupée)
+# ✅ Moins cher (pas de nouvelle instance Railway)
+# ✅ Schéma isolé `mission_control` dans Supabase existant
+# ✅ Pas de nouvelles variables DB à configurer
+#
+# INCONVÉNIENTS:
+# ⚠️ Mêmes ressources CPU/RAM que PG on Rails
+# ⚠️ Si Supabase down, MC down aussi
+# ⚠️ Pas de scaling indépendant
+# ============================================
+
+# Backend service
+[[services]]
+name = "mission-control-backend"
+path = "backend"
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# Variables spécifiques Option A:
+# DATABASE_URL = ws://postgres.railway.internal:5432/railway?schema=mission_control
+# Ou utiliser l'URL Supabase existante
+
+# Frontend service  
+[[services]]
+name = "mission-control-frontend"
+path = "frontend"
+startCommand = "npm start"
+buildCommand = "npm run build"
+healthcheckPath = "/"
+healthcheckTimeout = 30
+
+# Worker service (Optionnel - peut utiliser Redis Railway ou pas de queue)
+[[services]]
+name = "mission-control-worker"
+path = "backend"
+startCommand = "python -m app.worker"  # Ou sans Redis si simple
+restartPolicyType = "ON_FAILURE"
+
+# PAS de [[databases]] ici - on réutilise Supabase existant!
