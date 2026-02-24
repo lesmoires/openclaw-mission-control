@@ -32,9 +32,19 @@ def _normalize_database_url(database_url: str) -> str:
     return database_url
 
 
+# ============================================================================
+# MODIFICATION: Forcer l'utilisation du schéma mission_control
+# ============================================================================
+# On utilise connect_args pour définir le search_path PostgreSQL
+# Cela force toutes les requêtes à utiliser le schéma mission_control
+# ============================================================================
+
 async_engine: AsyncEngine = create_async_engine(
     _normalize_database_url(settings.database_url),
     pool_pre_ping=True,
+    connect_args={
+        "options": "-c search_path=mission_control,public,extensions"
+    },
 )
 async_session_maker = async_sessionmaker(
     async_engine,
