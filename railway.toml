@@ -26,11 +26,11 @@ name = "Mission Control Backend"
 source = "github"
 repo = "lesmoires/openclaw-mission-control"
 branch = "main"
-rootDirectory = "backend"
+# Build depuis la racine car Dockerfile utilise les chemins backend/
 
 # Build
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile"
+dockerfilePath = "backend/Dockerfile"
 
 # Runtime
 startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
